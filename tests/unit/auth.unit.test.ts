@@ -1,13 +1,13 @@
 import { redis } from "../../src/config/redis";
-import {
-  isHashedPassword,
-  isValidUserData,
-  loginUserTest,
-  refreshTokenTest,
-  registerUserTest,
-} from "../../src/modules/auth/auth.controller";
-
+import jwt from "jsonwebtoken";
 import { authUserSchema } from "../../src/modules/auth/auth.schema";
+import {
+  authenticateUser,
+  createUser,
+  verifyRefreshTokenAndGetAccessToken,
+} from "../../src/modules/auth/auth.service";
+import { isHashedPassword, isValidUserData } from "../../src/utils/helper";
+import { JWT_SECRET_REFRESH_TOKEN } from "../../src/config/env";
 
 const correctEmail = "test@email.com";
 const correctPassword = "12345";
@@ -102,19 +102,19 @@ describe("Input Validation Unit Test for Register & Login", () => {
 
 // register user
 describe("Register Unit Test", () => {
-  test("registration success", async () => {
-    const isRegisterSuccess = await registerUserTest(
-      correctEmail,
-      correctPassword,
-    );
-    expect(isRegisterSuccess).toBeTruthy();
+  test("registration success - should return 201", async () => {
+    const isRegisterSuccess = await createUser({
+      email: correctEmail,
+      password: correctPassword,
+    });
+    expect(isRegisterSuccess).toBe(201);
   });
-  test("registration fail - duplicate email", async () => {
-    const isRegisterFailure = await registerUserTest(
-      correctEmail,
-      wrongPassword,
-    );
-    expect(isRegisterFailure).toBeFalsy();
+  test("registration fail - should return 409 - duplicate email", async () => {
+    const isRegisterFailure = await createUser({
+      email: correctEmail,
+      password: wrongPassword,
+    });
+    expect(isRegisterFailure).toBe(409);
   });
 });
 
@@ -137,7 +137,10 @@ describe("Password Hashing Unit Test", () => {
 // login user
 describe("Login Unit Test", () => {
   test(`should return {'accessToken', 'refreshToken'}`, async () => {
-    const tokens = await loginUserTest(correctEmail, correctPassword);
+    const tokens = await authenticateUser({
+      email: correctEmail,
+      password: correctPassword,
+    });
     expect(tokens).toBeInstanceOf(Object);
     // and/or
     expect(tokens).not.toEqual({}); // should not be empty obj
@@ -147,13 +150,19 @@ describe("Login Unit Test", () => {
     expect(tokens).toHaveProperty("accessToken");
     expect(tokens).toHaveProperty("refreshToken");
   });
-  test(`should fail - wrong email & correct password`, async () => {
-    const isObjEmpty = await loginUserTest(wrongEmail, correctPassword);
-    expect(isObjEmpty).toEqual({});
+  test(`should return 404 - wrong email & correct password`, async () => {
+    const result = await authenticateUser({
+      email: wrongEmail,
+      password: correctPassword,
+    });
+    expect(result).toBe(404);
   });
-  test("should fail - correct email & wrong password", async () => {
-    const isObjEmpty = await loginUserTest(correctEmail, wrongPassword);
-    expect(isObjEmpty).toEqual({});
+  test("should return 401 - correct email & wrong password", async () => {
+    const result = await authenticateUser({
+      email: correctEmail,
+      password: wrongPassword,
+    });
+    expect(result).toBe(401);
   });
 });
 
@@ -179,28 +188,57 @@ describe("Corrupted User Unit Test", () => {
 
 describe("Refresh Token Unit Test", () => {
   test("should pass - get refresh & access token via login and then ask for access token", async () => {
-    const tokens: any = await loginUserTest(correctEmail, correctPassword);
+    const tokens: any = await authenticateUser({
+      email: correctEmail,
+      password: correctPassword,
+    });
     expect(tokens).toBeInstanceOf(Object);
+    // and/or
+    expect(tokens).not.toEqual({}); // should not be empty obj
+    // and/or
     expect(Object.keys(tokens).length).toBeGreaterThan(0);
+    // and/or
+    expect(tokens).toHaveProperty("accessToken");
+    expect(tokens).toHaveProperty("refreshToken");
+
     const refreshToken = tokens.refreshToken;
-    const newAccessToken = await refreshTokenTest(refreshToken);
-    expect(newAccessToken.length).toBeGreaterThan(0);
-    expect(newAccessToken).not.toEqual("");
+    const newAccessToken =
+      await verifyRefreshTokenAndGetAccessToken(refreshToken);
+    expect(newAccessToken).toBeInstanceOf(Object);
+    expect(newAccessToken).not.toEqual({});
+    expect(Object.keys(newAccessToken).length).toBeGreaterThan(0);
   });
-  test("should fail - empty refresh token", async () => {
-    const result = await refreshTokenTest("");
-    expect(result.length).toBe(0);
-    expect(result).toBeFalsy();
+  test("should return 400 - empty refresh token", async () => {
+    const result = await verifyRefreshTokenAndGetAccessToken("");
+    expect(result).toBe(400);
   });
-  test("should fail - tampered Refresh Token", async () => {
-    const result = await refreshTokenTest(tamperedRefreshToken);
-    expect(result.length).toBe(0);
-    expect(result).toBeFalsy();
+  test("should return 403 - tampered token but present in redis", async () => {
+    await redis.set(
+      `refreshToken: ${tamperedRefreshToken}`,
+      tamperedRefreshToken,
+    );
+    const result =
+      await verifyRefreshTokenAndGetAccessToken(tamperedRefreshToken);
+    expect(result).toBe(403);
   });
-  test("should fail - invalid refresh token", async () => {
-    const result = await refreshTokenTest(invalidRefreshToken);
-    expect(result.length).toBe(0);
-    expect(result).toBeFalsy();
+  test("should return 403 - malformed token present in redis", async () => {
+    await redis.set(
+      `refreshToken: ${invalidRefreshToken}`,
+      invalidRefreshToken,
+    );
+    const result =
+      await verifyRefreshTokenAndGetAccessToken(invalidRefreshToken);
+    expect(result).toBe(403);
+  });
+  test("should return 404 - valid JWT but missing fields", async () => {
+    // creating a token with missing role
+    const badToken = jwt.sign(
+      { id: "123", email: "bad@email.com" },
+      JWT_SECRET_REFRESH_TOKEN,
+      { expiresIn: "1h" },
+    );
+    const result = await verifyRefreshTokenAndGetAccessToken(badToken);
+    expect(result).toBe(404);
   });
 });
 

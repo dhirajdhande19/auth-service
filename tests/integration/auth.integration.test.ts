@@ -2,10 +2,10 @@
 
 import { redis } from "../../src/config/redis";
 import {
-  registerUserTest,
-  loginUserTest,
-  refreshTokenTest,
-} from "../../src/modules/auth/auth.controller";
+  authenticateUser,
+  createUser,
+  verifyRefreshTokenAndGetAccessToken,
+} from "../../src/modules/auth/auth.service";
 
 const email = "test@gmail.com";
 const password = "12345";
@@ -14,44 +14,44 @@ beforeAll(async () => {
   await redis.flushall(); // clears all keys
 });
 
-test("register user: Should return true", async () => {
-  const isRegisterSuccess = await registerUserTest(email, password);
-  expect(isRegisterSuccess).toBeTruthy(); // true
+test("register user: Should return 201", async () => {
+  const result = await createUser({ email, password });
+  expect(result).toBe(201);
 });
 
-test("register user: Should return false", async () => {
-  const isRegisterFailure = await registerUserTest(email, password);
-  expect(isRegisterFailure).toBeFalsy(); // failure reason: same email
+test("register user: Should return 409", async () => {
+  const result = await createUser({ email, password });
+  expect(result).toBe(409); // failure reason: same email
 });
 
 test("login user: Should return object (accessToken, refreshToken)", async () => {
   // login
-  const tokens = await loginUserTest(email, password);
+  const tokens = await authenticateUser({ email, password });
   expect(tokens).toBeInstanceOf(Object);
   // or/and
   expect(Object.keys(tokens).length).toBeGreaterThan(0);
   // or/and
   expect(tokens).not.toEqual({});
+  // or/and
+  expect(tokens).toHaveProperty("accessToken");
+  expect(tokens).toHaveProperty("refreshToken");
 });
 
-test("login user: Should return null ( {} )", async () => {
-  const NullToken = await loginUserTest(email, "54321");
-  expect(Object.keys(NullToken)).toHaveLength(0); // failure reason: wrong password (reaturn {})
-  // or / and
-  expect(NullToken).toEqual({});
+test("login user: Should return 401 - wrong password", async () => {
+  const result = await authenticateUser({ email, password: "54321" });
+  expect(result).toBe(401);
 });
 
 test("refresh token: Should return access token", async () => {
   // refreshToken after login
-  const tokens: any = await loginUserTest(email, password);
+  const tokens: any = await authenticateUser({ email, password });
   expect(tokens).toBeInstanceOf(Object);
   // or/and
   expect(tokens).not.toEqual({});
   // call for refresh to get new access token
-  const newAccessToken = await refreshTokenTest(tokens.refreshToken);
-  // console.log(newAccessToken);
-  expect(newAccessToken.length).toBeGreaterThan(0);
-  // or/and
+  const newAccessToken = await verifyRefreshTokenAndGetAccessToken(
+    tokens.refreshToken,
+  );
   expect(newAccessToken).not.toEqual("");
 });
 
