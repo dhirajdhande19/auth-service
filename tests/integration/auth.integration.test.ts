@@ -4,29 +4,38 @@ import { redis } from "../../src/config/redis";
 import {
   authenticateUser,
   createUser,
-  verifyRefreshTokenAndGetAccessToken,
-} from "../../src/modules/auth/auth.service";
+} from "../../src/modules/auth/local/localAuth.service";
+import { verifyRefreshTokenAndGetAccessToken } from "../../src/modules/token/token.service";
+import { LocalUser, UserRole } from "../../src/modules/user/user.types";
 
 const email = "test@gmail.com";
 const password = "12345";
+
+const ValidUserData: LocalUser = {
+  id: crypto.randomUUID(),
+  email: email,
+  password: password,
+  role: UserRole.User,
+  provider: "local",
+};
 
 beforeAll(async () => {
   await redis.flushall(); // clears all keys
 });
 
 test("register user: Should return 201", async () => {
-  const result = await createUser({ email, password });
+  const result = await createUser(ValidUserData);
   expect(result).toBe(201);
 });
 
 test("register user: Should return 409", async () => {
-  const result = await createUser({ email, password });
+  const result = await createUser(ValidUserData);
   expect(result).toBe(409); // failure reason: same email
 });
 
 test("login user: Should return object (accessToken, refreshToken)", async () => {
   // login
-  const tokens = await authenticateUser({ email, password });
+  const tokens = await authenticateUser(ValidUserData);
   expect(tokens).toBeInstanceOf(Object);
   // or/and
   expect(Object.keys(tokens).length).toBeGreaterThan(0);

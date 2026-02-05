@@ -12,7 +12,11 @@ app.use("/api/auth", authRoutes);
 
 // demo (test) route
 app.get("/protected", authMiddleware, (req: Request, res: Response) => {
-  res.status(200).json("protected data");
+  res.status(200).json({ message: "protected data" });
+});
+
+app.get("/auth_system", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Home Page For Auth System" });
 });
 
 export default app;

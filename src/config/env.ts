@@ -20,3 +20,13 @@ export const JWT_EXPIRES_IN_REFRESH_TOKEN = process.env
 // redis expire refresh token(in days)
 export const REDIS_EXPIRE_REFRESH_TOKEN =
   process.env.REDIS_EXPIRE_REFRESH_TOKEN;
+
+// Google OAuth
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+export const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+// GitHun OAuth
+export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+export const GITHUB_REDIRECT_URI = process.env.GITHUB_REDIRECT_URI;
+export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;

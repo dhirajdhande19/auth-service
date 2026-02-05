@@ -1,13 +1,20 @@
 import { redis } from "../../src/config/redis";
 import jwt from "jsonwebtoken";
 import { authUserSchema } from "../../src/modules/auth/auth.schema";
+import { isHashedPassword, isValidUserData } from "../../src/utils/helper";
+import { JWT_SECRET_REFRESH_TOKEN } from "../../src/config/env";
+import {
+  AuthProvider,
+  LocalUser,
+  UserData,
+  UserRole,
+} from "../../src/modules/user/user.types";
+
 import {
   authenticateUser,
   createUser,
-  verifyRefreshTokenAndGetAccessToken,
-} from "../../src/modules/auth/auth.service";
-import { isHashedPassword, isValidUserData } from "../../src/utils/helper";
-import { JWT_SECRET_REFRESH_TOKEN } from "../../src/config/env";
+} from "../../src/modules/auth/local/localAuth.service";
+import { verifyRefreshTokenAndGetAccessToken } from "../../src/modules/token/token.service";
 
 const correctEmail = "test@email.com";
 const correctPassword = "12345";
@@ -24,20 +31,26 @@ const validHashedPassword =
   "$2b$10$iGg/9uZhbLVhl.BkFnfNoO0OGnLuweX.URICnzXIePPz5uCFrj7uu";
 const invalidHashedPassword = "Wrong_Hashed_Password";
 
-const validUser = {
-  id: "id_123",
+const validUser: UserData = {
+  id: crypto.randomUUID(),
   email: "validUser@gmail.com",
   password: "userPassword",
-  role: "User",
+  role: UserRole.User,
+  provider: "local",
 };
-const invalidRoleUser = {
-  id: "id_124",
-  email: "validUser2@gmail.com",
-  role: "Author",
+
+const emptyInvalidUser: UserData = {
+  id: "",
+  email: "",
+  password: "",
+  role: UserRole.User,
+  provider: "local",
 };
-const emptyInvalidUser = {};
-const invalidUser = {
-  id: "125",
+const invalidUserOAuthUser: UserData = {
+  id: "",
+  email: "",
+  role: UserRole.User,
+  provider: AuthProvider.Google,
 };
 
 const tamperedRefreshToken =
@@ -102,18 +115,19 @@ describe("Input Validation Unit Test for Register & Login", () => {
 
 // register user
 describe("Register Unit Test", () => {
+  const userData: LocalUser = {
+    email: correctEmail,
+    password: correctPassword,
+    role: UserRole.User,
+    id: crypto.randomUUID(),
+    provider: "local",
+  };
   test("registration success - should return 201", async () => {
-    const isRegisterSuccess = await createUser({
-      email: correctEmail,
-      password: correctPassword,
-    });
+    const isRegisterSuccess = await createUser(userData);
     expect(isRegisterSuccess).toBe(201);
   });
   test("registration fail - should return 409 - duplicate email", async () => {
-    const isRegisterFailure = await createUser({
-      email: correctEmail,
-      password: wrongPassword,
-    });
+    const isRegisterFailure = await createUser(userData);
     expect(isRegisterFailure).toBe(409);
   });
 });
@@ -137,10 +151,17 @@ describe("Password Hashing Unit Test", () => {
 // login user
 describe("Login Unit Test", () => {
   test(`should return {'accessToken', 'refreshToken'}`, async () => {
-    const tokens = await authenticateUser({
-      email: correctEmail,
-      password: correctPassword,
-    });
+    const validUser: UserData = {
+      id: crypto.randomUUID(),
+      email: "new@gmail.com",
+      password: "userPassword",
+      role: UserRole.User,
+      provider: "local",
+    };
+
+    const result = await createUser(validUser);
+    expect(result).toBe(201);
+    const tokens = await authenticateUser(validUser);
     expect(tokens).toBeInstanceOf(Object);
     // and/or
     expect(tokens).not.toEqual({}); // should not be empty obj
@@ -172,16 +193,12 @@ describe("Corrupted User Unit Test", () => {
     const isUserCorrupted = isValidUserData(validUser);
     expect(isUserCorrupted).toBeTruthy();
   });
-  test("should be corrupted user_data - empty user data", () => {
+  test("should be corrupted user_data - Invalid local user", () => {
     const isUserCorrupted = isValidUserData(emptyInvalidUser);
     expect(isUserCorrupted).toBeFalsy();
   });
-  test("should be corrupted user_data - only 1 valid field out of 3", () => {
-    const isUserCorrupted = isValidUserData(invalidUser);
-    expect(isUserCorrupted).toBeFalsy();
-  });
-  test("should be corrupted user_data - mismatched role", () => {
-    const isUserCorrupted = isValidUserData(invalidRoleUser);
+  test("should be corrupted user_data - Invalid OAuth user", () => {
+    const isUserCorrupted = isValidUserData(invalidUserOAuthUser);
     expect(isUserCorrupted).toBeFalsy();
   });
 });
