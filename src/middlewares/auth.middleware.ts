@@ -23,7 +23,7 @@ export const authMiddleware = (
       console.log(
         `status: fail\nerror: No Access Token provided\n-----Auth Check End-----`,
       );
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
@@ -36,7 +36,7 @@ export const authMiddleware = (
       console.log(
         `status: fail\nerror: Could not decode user from jwt\n-----Auth Check End-----`,
       );
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
     console.log(`status: success\n-----Auth Check End-----`);
@@ -47,6 +47,6 @@ export const authMiddleware = (
     return res
 
       .status(401)
-      .json({ message: "Invalid Token", details: e?.message });
+      .json({ error: "Invalid Token", details: e?.message });
   }
 };

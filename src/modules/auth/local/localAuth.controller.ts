@@ -22,14 +22,14 @@ export const registerUser = async (
   } else if (statusCode === 409) {
     // conflict
     res.status(statusCode).json({
-      message: `User with given email already exists, try new email!`,
+      error: `User with given email already exists, try new email!`,
     });
   } else if (statusCode === 400) {
     // Unauthorized
-    res.status(statusCode).json({ message: "Password/Email are required" });
+    res.status(statusCode).json({ error: "Password/Email are required" });
   } else {
     // internal server issues
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -49,18 +49,18 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   if (result === 401) {
     // Unauthorized
-    res.status(result).json({ message: "Unauthorized" });
+    res.status(result).json({ error: "Unauthorized" });
   } else if (result === 400) {
     // Unauthorized
-    res.status(result).json({ message: "Password/Email are required" });
+    res.status(result).json({ error: "Password/Email are required" });
   } else if (result === 404) {
     // user not found
     res.status(result).json({
-      message:
+      error:
         "No user found with given email, Register first! or Invalid User Data",
     });
   } else {
     // internal server issues
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

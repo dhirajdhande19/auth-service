@@ -21,14 +21,14 @@ export const refreshToken = async (
 
   if (result === 404) {
     res.status(result).json({
-      message: "Unauthorized",
+      error: "Unauthorized",
       details: "refreshToken is expired, re-login to create new refreshToken",
     });
   } else if (result === 403) {
-    res.status(result).json({ message: "Unauthorized" });
+    res.status(result).json({ error: "Unauthorized" });
   } else if (result === 401) {
-    res.status(result).json({ message: "Invalid User Data" });
+    res.status(result).json({ error: "Invalid User Data" });
   } else {
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -25,7 +25,7 @@ export const googleCallback = async (
   if (typeof result === "object" && result != null) {
     const refreshToken = result.refreshToken;
     if (!refreshToken) {
-      res.status(400).json({ message: "Refresh Token is required" });
+      res.status(400).json({ error: "Refresh Token is required" });
       return;
     }
     await setRefreshTokenInRedis(refreshToken);
@@ -34,13 +34,13 @@ export const googleCallback = async (
   }
 
   // failure cases
-  if (result === 404) {
+  if (result === 409) {
     res
       .status(result)
       .json({ message: "User already exists, try loging in locally" });
   } else if (result === 400) {
-    res.status(result).json({ message: "Email is required" });
+    res.status(result).json({ error: "Email is required" });
   } else {
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

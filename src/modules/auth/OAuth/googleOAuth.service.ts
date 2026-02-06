@@ -61,10 +61,10 @@ export const registerGoogleOAuthUser = async (
     if (!email) return 400;
     const isPrevUser = await redis.hgetall(`user: ${email}`);
 
-    if (isPrevUser && isPrevUser.provider === "local") return 404;
+    if (isPrevUser && isPrevUser.provider === "local") return 409;
 
     // if no prevUser, first register user (Create Account) then login
-    if (!isPrevUser) {
+    if (!isPrevUser || Object.keys(isPrevUser).length === 0) {
       const userData: OAuthUser = {
         id: crypto.randomUUID(),
         email: email,
@@ -92,7 +92,7 @@ export const registerGoogleOAuthUser = async (
     return { accessToken: accessToken, refreshToken: refreshToken };
   } catch (e: any) {
     console.log(
-      `\n-----Err From googleAuth-----\nerr details: ${e?.message}\n`,
+      `\n-----Err From registerGoogleOAuthUser-----\nerr details: ${e?.message}\n`,
     );
     return 500;
   }

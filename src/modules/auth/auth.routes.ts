@@ -8,7 +8,10 @@ import {
 } from "./OAuth/googleOAuth.controller";
 import { loginUser, registerUser } from "./local/localAuth.controller";
 import { refreshToken } from "../token/token.controller";
-import { redirectToGithub } from "./OAuth/githubOAuth.controller";
+import {
+  githubCallback,
+  redirectToGithub,
+} from "./OAuth/githubOAuth.controller";
 
 const router = Router();
 // local auth
@@ -22,5 +25,5 @@ router.get("/google", wrapAsync(redirectToGoogle));
 router.get("/google/callback", wrapAsync(googleCallback));
 // github
 router.get("/github", wrapAsync(redirectToGithub));
-router.get("/github/callback", wrapAsync(redirectToGithub));
+router.get("/github/callback", wrapAsync(githubCallback));
 export default router;
