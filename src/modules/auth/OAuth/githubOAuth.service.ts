@@ -31,7 +31,7 @@ export const getUserEmailFromGithub = async (
 
     return res.data?.email as string;
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err From getUserEmailFromGithub-----\nerr details: ${e?.message}\n`,
     );
     return 500;
@@ -64,7 +64,7 @@ export const getGithubAccessToken = async (
 
     return res.data?.access_token;
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err From getGithubAccessToken-----\nerr details: ${e?.message}\n`,
     );
     return 500;
@@ -108,7 +108,7 @@ export const registerGithubOAuthUser = async (
 
     return { accessToken: accessToken, refreshToken: refreshToken };
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err From registerGithubOAuthUser-----\nerr details: ${e?.message}\n`,
     );
     return 500;

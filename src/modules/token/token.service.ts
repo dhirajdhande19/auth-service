@@ -28,7 +28,7 @@ export const getJwtAccessToken = (userData: TokenInput): string => {
 
     return accessToken;
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err from getJwtAccessToken-----\nerr details: ${e?.message}`,
     );
     return "";
@@ -52,7 +52,7 @@ export const getJwtRefreshToken = (userData: TokenInput): string => {
 
     return refreshToken;
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err from getJwtRefreshToken-----\nerr details: ${e?.message}`,
     );
     return "";
@@ -61,17 +61,24 @@ export const getJwtRefreshToken = (userData: TokenInput): string => {
 
 export const setRefreshTokenInRedis = async (
   refreshToken: string,
+  email: string,
 ): Promise<void> => {
   try {
-    // update refresh token for user
-    await redis.set(`refreshToken: ${refreshToken}`, refreshToken);
-    // set expiry
+    // calculate expiry
     const expireIn = REDIS_EXPIRE_REFRESH_TOKEN
       ? Number(REDIS_EXPIRE_REFRESH_TOKEN) * 24 * 60 * 60
       : 604800; // fallback to 7days in seconds
-    await redis.expire(`refreshToken: ${refreshToken}`, expireIn); // days * 24 * 60 * 60 -> xxx Seconds
+
+    const isNew = await redis.exists(`refreshTokens: ${email}`); // auto expires)
+    if (isNew === 0) await redis.expire(`refreshTokens: ${email}`, expireIn);
+
+    await redis
+      .multi()
+      .set(`refreshToken: ${refreshToken}`, email, "EX", expireIn) // to later revoke single session
+      .sadd(`refreshTokens: ${email}`, refreshToken) // to later revoke all sessions
+      .exec();
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err from getJwtRefreshToken-----\nerr details: ${e?.message}`,
     );
   }
@@ -108,8 +115,58 @@ export const verifyRefreshTokenAndGetAccessToken = async (
 
     return { accessToken: accessToken };
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err From verifyRefreshTokenAndGetAccessToken-----\nerr details: ${e?.message}\n`,
+    );
+    return 403;
+  }
+};
+
+export const revokeCurrentSession = async (
+  refreshToken: string,
+): Promise<number> => {
+  try {
+    if (!refreshToken) return 400;
+    const key = `refreshToken: ${refreshToken}`;
+    const email = await redis.get(key);
+    if (!email) return 404;
+
+    await redis
+      .multi()
+      .del(key) // revoke curr session
+      .srem(`refreshTokens:${email}`, refreshToken) // revoke curr session from all sessions list
+      .exec();
+
+    return 200;
+  } catch (e: any) {
+    console.error(
+      `\n-----Err From revokeCurrentSession-----\nerr details: ${e?.message}\n`,
+    );
+    return 403;
+  }
+};
+
+export const revokeAllSessions = async (
+  refreshToken: string,
+): Promise<number> => {
+  try {
+    if (!refreshToken) return 400;
+    const key = `refreshToken: ${refreshToken}`;
+    const email = await redis.get(key);
+
+    if (!email) return 404;
+
+    const tokens = await redis.smembers(`refreshTokens:${email}`);
+
+    const pipeline = redis.multi();
+    tokens.forEach((token) => pipeline.del(`refreshToken:${token}`)); // delete all tokens from list
+    pipeline.del(`refreshTokens:${email}`); // delete list of tokens
+    await pipeline.exec();
+
+    return 200;
+  } catch (e: any) {
+    console.error(
+      `\n-----Err From revokeAllSessions-----\nerr details: ${e?.message}\n`,
     );
     return 403;
   }

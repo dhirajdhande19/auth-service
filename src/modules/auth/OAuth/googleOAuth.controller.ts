@@ -28,7 +28,7 @@ export const googleCallback = async (
       res.status(400).json({ error: "Refresh Token is required" });
       return;
     }
-    await setRefreshTokenInRedis(refreshToken);
+    await setRefreshTokenInRedis(refreshToken, email);
     res.status(201).json(result);
     return;
   }

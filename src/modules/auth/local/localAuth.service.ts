@@ -30,7 +30,9 @@ export const createUser = async (user: LocalUser): Promise<number> => {
     // user created successfully
     return 201;
   } catch (e: any) {
-    console.log(`\n-----Err from createUser-----\nerr details: ${e?.message}`);
+    console.error(
+      `\n-----Err from createUser-----\nerr details: ${e?.message}`,
+    );
     return 500;
   }
 };
@@ -85,14 +87,14 @@ export const authenticateUser = async (
 
     if (!accessToken || !refreshToken) return 500;
 
-    await setRefreshTokenInRedis(refreshToken);
+    await setRefreshTokenInRedis(refreshToken, userData.email);
 
     return {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
   } catch (e: any) {
-    console.log(
+    console.error(
       `\n-----Err from authenticateUser-----\nerr details: ${e?.message}`,
     );
     return 500;

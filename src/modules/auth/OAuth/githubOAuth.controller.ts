@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
-import {
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
-  GITHUB_REDIRECT_URI,
-} from "../../../config/env";
+import { GITHUB_CLIENT_ID, GITHUB_REDIRECT_URI } from "../../../config/env";
 import {
   generateCodeChallenge,
   generateCodeVerifier,
 } from "../../../utils/pkce";
-import axios from "axios";
 import {
   getGithubAccessToken,
   getUserEmailFromGithub,
@@ -76,7 +71,7 @@ export const githubCallback = async (
       return;
     }
 
-    await setRefreshTokenInRedis(refreshToken);
+    await setRefreshTokenInRedis(refreshToken, email);
     res.status(201).json(result);
     return;
   }

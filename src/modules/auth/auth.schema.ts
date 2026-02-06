@@ -9,9 +9,3 @@ export const authUserSchema = z
       .max(30, { message: "Password must be less than or equal to 30 chars" }),
   })
   .required();
-
-export const refreshTokenSchema = z
-  .object({
-    refreshToken: z.string(),
-  })
-  .required();

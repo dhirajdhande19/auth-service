@@ -43,7 +43,9 @@ export const authMiddleware = (
     req.user = decodedUser;
     next();
   } catch (e: any) {
-    console.log(`status: fail\nerror: ${e?.message}\n-----Auth Check End-----`);
+    console.error(
+      `status: fail\nerror: ${e?.message}\n-----Auth Check End-----`,
+    );
     return res
 
       .status(401)
