@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET_ACCESS_TOKEN } from "../config/env";
+import { logger } from "../utils/logger";
 
 // coz we need to set req.user = user (by default ts will give err so we improvise)
 export interface AuthRequest extends Request {
@@ -16,13 +17,13 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
+  const route = req.originalUrl;
   try {
-    console.log(`\n-----Auth Check Start-----\nroute: ${req.originalUrl}`);
+    logger.info({ route }, "Auth check started");
     const accessToken = req.headers.authorization?.split(" ")[1];
+
     if (!accessToken) {
-      console.log(
-        `status: fail\nerror: No Access Token provided\n-----Auth Check End-----`,
-      );
+      logger.warn({ route }, "No access token provided");
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
@@ -33,19 +34,18 @@ export const authMiddleware = (
       role: "User" | "Admin";
     };
     if (!decodedUser) {
-      console.log(
-        `status: fail\nerror: Could not decode user from jwt\n-----Auth Check End-----`,
-      );
+      logger.warn({ route }, "Could not decode user from jwt");
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    console.log(`status: success\n-----Auth Check End-----`);
+
+    logger.info({ route, userId: decodedUser.id }, "Auth check successful");
+
     req.user = decodedUser;
     next();
   } catch (e: any) {
-    console.error(
-      `status: fail\nerror: ${e?.message}\n-----Auth Check End-----`,
-    );
+    logger.error({ route, error: e?.message }, "Invalid or expired token");
+
     return res
 
       .status(401)

@@ -11,9 +11,10 @@ import authRoutes from "./modules/auth/auth.routes";
 import tokenRoutes from "./modules/token/token.routes";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import { adminRoleMiddleware } from "./middlewares/adminRole.Middleware";
+import { rateLimit } from "./middlewares/rateLimit.middleware";
 
-app.use("/api/auth", authRoutes);
-app.use("/api/token", tokenRoutes);
+app.use("/api/auth", rateLimit, authRoutes);
+app.use("/api/token", rateLimit, tokenRoutes);
 
 // demo (test) route
 app.get("/protected", authMiddleware, (req: Request, res: Response) => {

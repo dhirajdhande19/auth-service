@@ -15,6 +15,7 @@ import {
   GITHUB_CLIENT_SECRET,
   GITHUB_REDIRECT_URI,
 } from "../../../config/env";
+import { logger } from "../../../utils/logger";
 
 export const getUserEmailFromGithub = async (
   accessToken: string,
@@ -31,9 +32,7 @@ export const getUserEmailFromGithub = async (
 
     return res.data?.email as string;
   } catch (e: any) {
-    console.error(
-      `\n-----Err From getUserEmailFromGithub-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error From getUserEmailFromGithub");
     return 500;
   }
 };
@@ -64,9 +63,7 @@ export const getGithubAccessToken = async (
 
     return res.data?.access_token;
   } catch (e: any) {
-    console.error(
-      `\n-----Err From getGithubAccessToken-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error From getGithubAccessToken");
     return 500;
   }
 };
@@ -108,9 +105,7 @@ export const registerGithubOAuthUser = async (
 
     return { accessToken: accessToken, refreshToken: refreshToken };
   } catch (e: any) {
-    console.error(
-      `\n-----Err From registerGithubOAuthUser-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error From registerGithubOAuthUser");
     return 500;
   }
 };

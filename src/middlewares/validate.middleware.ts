@@ -1,25 +1,31 @@
 import { Request, Response, NextFunction } from "express";
 import z from "zod";
+import { logger } from "../utils/logger";
 
 export const validate =
   (schema: z.ZodType) => (req: Request, res: Response, next: NextFunction) => {
-    console.log(`\n-----Zod Validation Start-----\nroute: ${req.originalUrl}`);
+    const route = req.originalUrl;
 
-    const result = schema.safeParse(req.body);
+    try {
+      logger.info({ route }, "Zod validation started");
 
-    if (!result.success) {
-      console.log(
-        `status: fail\nerror: "Validation error"\ndetails: ${result.error}\n-----Zod Validation End-----\n`,
-      );
+      const result = schema.safeParse(req.body);
 
-      return res.status(400).json({
-        error: "Validation error",
-        details: z.treeifyError(result.error),
-      });
+      if (!result.success) {
+        logger.error({ route, details: result.error }, "Zod validation failed");
+
+        return res.status(400).json({
+          error: "Validation error",
+          details: z.treeifyError(result.error),
+        });
+      }
+
+      logger.info({ route }, "Zod validation succcessful");
+      req.body = result.data;
+
+      next();
+    } catch (e) {
+      logger.error({ route }, "Zod validation failed");
+      next();
     }
-
-    console.log("status: success\n-----Zod Validation End-----\n");
-    req.body = result.data;
-
-    next();
   };

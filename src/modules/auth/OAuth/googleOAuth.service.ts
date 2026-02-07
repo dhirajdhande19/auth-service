@@ -14,6 +14,7 @@ import {
 } from "../../token/token.service";
 
 import { TokensAfterLogin, TokenInput } from "../../token/token.types";
+import { logger } from "../../../utils/logger";
 
 export const googleAuth = async (code: string): Promise<number | any> => {
   try {
@@ -47,9 +48,7 @@ export const googleAuth = async (code: string): Promise<number | any> => {
 
     return googleUser;
   } catch (e: any) {
-    console.error(
-      `\n-----Err From googleAuth-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error From googleAuth");
     return 500;
   }
 };
@@ -91,9 +90,7 @@ export const registerGoogleOAuthUser = async (
 
     return { accessToken: accessToken, refreshToken: refreshToken };
   } catch (e: any) {
-    console.error(
-      `\n-----Err From registerGoogleOAuthUser-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error From registerGoogleOAuthUser");
     return 500;
   }
 };

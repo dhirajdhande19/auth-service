@@ -13,6 +13,7 @@ import {
   getJwtRefreshToken,
   setRefreshTokenInRedis,
 } from "../../token/token.service";
+import { logger } from "../../../utils/logger";
 
 export const createUser = async (user: LocalUser): Promise<number> => {
   const email = user.email;
@@ -30,9 +31,7 @@ export const createUser = async (user: LocalUser): Promise<number> => {
     // user created successfully
     return 201;
   } catch (e: any) {
-    console.error(
-      `\n-----Err from createUser-----\nerr details: ${e?.message}`,
-    );
+    logger.error({ details: e?.message }, "Error from createUser");
     return 500;
   }
 };
@@ -94,9 +93,7 @@ export const authenticateUser = async (
       refreshToken: refreshToken,
     };
   } catch (e: any) {
-    console.error(
-      `\n-----Err from authenticateUser-----\nerr details: ${e?.message}`,
-    );
+    logger.error({ details: e?.message }, "Error from authenticateUser");
     return 500;
   }
 };

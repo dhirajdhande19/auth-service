@@ -7,6 +7,7 @@ import {
 } from "../../config/env";
 import { redis } from "../../config/redis";
 import { isValidAuthUser, isValidProvider } from "../../utils/helper";
+import { logger } from "../../utils/logger";
 import { ValidAuthUserData, UserData } from "../user/user.types";
 import { TokenInput, AccessToken } from "./token.types";
 import jwt from "jsonwebtoken";
@@ -28,9 +29,7 @@ export const getJwtAccessToken = (userData: TokenInput): string => {
 
     return accessToken;
   } catch (e: any) {
-    console.error(
-      `\n-----Err from getJwtAccessToken-----\nerr details: ${e?.message}`,
-    );
+    logger.error({ details: e?.message }, "Error from getJwtAccessToken");
     return "";
   }
 };
@@ -52,9 +51,7 @@ export const getJwtRefreshToken = (userData: TokenInput): string => {
 
     return refreshToken;
   } catch (e: any) {
-    console.error(
-      `\n-----Err from getJwtRefreshToken-----\nerr details: ${e?.message}`,
-    );
+    logger.error({ details: e?.message }, "Error from getJwtRefreshToken");
     return "";
   }
 };
@@ -78,9 +75,7 @@ export const setRefreshTokenInRedis = async (
       .sadd(`refreshTokens: ${email}`, refreshToken) // to later revoke all sessions
       .exec();
   } catch (e: any) {
-    console.error(
-      `\n-----Err from getJwtRefreshToken-----\nerr details: ${e?.message}`,
-    );
+    logger.error({ details: e?.message }, "Error from setRefreshTokenInRedis");
   }
 };
 
@@ -115,8 +110,9 @@ export const verifyRefreshTokenAndGetAccessToken = async (
 
     return { accessToken: accessToken };
   } catch (e: any) {
-    console.error(
-      `\n-----Err From verifyRefreshTokenAndGetAccessToken-----\nerr details: ${e?.message}\n`,
+    logger.error(
+      { details: e?.message },
+      "Error from verifyRefreshTokenAndGetAccessToken",
     );
     return 403;
   }
@@ -139,9 +135,7 @@ export const revokeCurrentSession = async (
 
     return 200;
   } catch (e: any) {
-    console.error(
-      `\n-----Err From revokeCurrentSession-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error from revokeCurrentSession");
     return 403;
   }
 };
@@ -165,9 +159,7 @@ export const revokeAllSessions = async (
 
     return 200;
   } catch (e: any) {
-    console.error(
-      `\n-----Err From revokeAllSessions-----\nerr details: ${e?.message}\n`,
-    );
+    logger.error({ details: e?.message }, "Error from revokeAllSessions");
     return 403;
   }
 };
