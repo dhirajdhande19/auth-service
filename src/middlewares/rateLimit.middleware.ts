@@ -1,10 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AuthRequest } from "./auth.middleware";
-import RATE_LIMIT_CONFIG, {
-  BaseRateLimit,
-  RateLimit,
-  Routes,
-} from "../config/rateLimit";
+import RATE_LIMIT_CONFIG, { BaseRateLimit, Routes } from "../config/rateLimit";
 import { redis } from "../config/redis";
 import { logger } from "../utils/logger";
 
@@ -57,10 +53,10 @@ export const rateLimit = async (
 
     if (effectiveCount > routeConfig.limit) {
       logger.error(
-        { route, message: "Too Many Request!" },
+        { route, error: "Too Many Request!" },
         "Rate limit check failed",
       );
-      return res.status(429).json({ message: "Too Many Request!" });
+      return res.status(429).json({ error: "Too Many Request!" });
     }
 
     logger.info({ route }, "Rate limit check successful");

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET_ACCESS_TOKEN } from "../config/env";
 import { logger } from "../utils/logger";
+import { BaseUser } from "../modules/user/user.types";
 
 // coz we need to set req.user = user (by default ts will give err so we improvise)
 export interface AuthRequest extends Request {
@@ -20,7 +21,7 @@ export const authMiddleware = (
   const route = req.originalUrl;
   try {
     logger.info({ route }, "Auth check started");
-    const accessToken = req.headers.authorization?.split(" ")[1];
+    const accessToken = req.headers?.authorization?.split(" ")[1];
 
     if (!accessToken) {
       logger.warn({ route }, "No access token provided");
@@ -28,11 +29,10 @@ export const authMiddleware = (
       return;
     }
 
-    const decodedUser = jwt.verify(accessToken, JWT_SECRET_ACCESS_TOKEN) as {
-      email: string;
-      id: string;
-      role: "User" | "Admin";
-    };
+    const decodedUser = jwt.verify(
+      accessToken,
+      JWT_SECRET_ACCESS_TOKEN,
+    ) as BaseUser;
     if (!decodedUser) {
       logger.warn({ route }, "Could not decode user from jwt");
       res.status(401).json({ error: "Unauthorized" });

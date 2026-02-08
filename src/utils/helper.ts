@@ -45,8 +45,10 @@ export const isValidAuthUser = (user: ValidAuthUserData): boolean => {
     !user.email ||
     !user.id ||
     !user.provider ||
+    !isValidProvider(user.provider) ||
     !(user.role in UserRole)
   )
     return false;
+
   return true;
 };

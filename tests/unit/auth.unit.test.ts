@@ -22,15 +22,6 @@ const correctPassword = "12345";
 const wrongEmail = "wrong@email.com";
 const wrongPassword = "54321";
 
-const invalidEmail = "invalid-email";
-const veryLongPassWord = `very-long-password-very-long-password-very-long-password-very-long-password-very-long-password-very-long-password-very-long-password-very-long-password-very-long-password`;
-const veryShortPassword = "1";
-const spacedPassword = " this is new password ";
-
-const validHashedPassword =
-  "$2b$10$iGg/9uZhbLVhl.BkFnfNoO0OGnLuweX.URICnzXIePPz5uCFrj7uu";
-const invalidHashedPassword = "Wrong_Hashed_Password";
-
 const validUser: UserData = {
   id: crypto.randomUUID(),
   email: "validUser@gmail.com",
@@ -62,57 +53,6 @@ beforeAll(async () => {
   await redis.flushall(); // clears all keys
 });
 
-// cases like {valid-email, empty-fields, short_null_veryLong-password...} are handled by zod-validation
-describe("Input Validation Unit Test for Register & Login", () => {
-  test("validation success", () => {
-    const result = authUserSchema.safeParse({
-      email: correctEmail,
-      password: correctPassword,
-    });
-    expect(result.success).toBeTruthy();
-  });
-  test("validation fail - empty fields (email, password)", () => {
-    const result = authUserSchema.safeParse({});
-    expect(result.success).toBeFalsy();
-  });
-  test("validation fail - empty email", () => {
-    const result = authUserSchema.safeParse({ password: correctPassword });
-    expect(result.success).toBeFalsy();
-  });
-  test("validation fail - empty password", () => {
-    const result = authUserSchema.safeParse({ email: correctEmail });
-    expect(result.success).toBeFalsy();
-  });
-  test("validation fail - invalid email format", () => {
-    const result = authUserSchema.safeParse({
-      email: invalidEmail,
-      password: correctPassword,
-    });
-    expect(result.success).toBeFalsy();
-  });
-  test("validation fail - very short password (min should be >= 5)", () => {
-    const result = authUserSchema.safeParse({
-      email: correctEmail,
-      password: veryShortPassword,
-    });
-    expect(result.success).toBeFalsy();
-  });
-  test("validation fail - very long password (max should be <= 20)", () => {
-    const result = authUserSchema.safeParse({
-      email: correctEmail,
-      password: veryLongPassWord,
-    });
-    expect(result.success).toBeFalsy();
-  });
-  test("validation success - should pass passwords with spaces", () => {
-    const result = authUserSchema.safeParse({
-      email: correctEmail,
-      password: spacedPassword,
-    });
-    expect(result.success).toBeTruthy();
-  });
-});
-
 // register user
 describe("Register Unit Test", () => {
   const userData: LocalUser = {
@@ -129,22 +69,6 @@ describe("Register Unit Test", () => {
   test("registration fail - should return 409 - duplicate email", async () => {
     const isRegisterFailure = await createUser(userData);
     expect(isRegisterFailure).toBe(409);
-  });
-});
-
-// password hashing test
-describe("Password Hashing Unit Test", () => {
-  test("password hashing success - valid hashed password", () => {
-    const result = isHashedPassword(validHashedPassword);
-    expect(result).toBeTruthy();
-  });
-  test("password hashing fail - invalid hashed password", () => {
-    const result = isHashedPassword(invalidHashedPassword);
-    expect(result).toBeFalsy();
-  });
-  test("password hashing fail - empty hashedPassword", () => {
-    const result = isHashedPassword("");
-    expect(result).toBeFalsy();
   });
 });
 

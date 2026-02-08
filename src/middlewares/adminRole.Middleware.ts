@@ -3,6 +3,16 @@ import { AuthRequest } from "./auth.middleware";
 import { UserRole } from "../modules/user/user.types";
 import { logger } from "../utils/logger";
 
+/*
+ Note: adminRoleMiddleware is used when we have to rejct all user requests, unless the role is Admin
+ so, 
+ if(role != Admin) {
+  reject request
+ } else proccess request
+
+ **Imp Note:** It's necessary that we use authMiddleware before calling adminRoleMiddleware
+*/
+
 export const adminRoleMiddleware = (
   req: AuthRequest,
   res: Response,
@@ -31,8 +41,7 @@ export const adminRoleMiddleware = (
   } catch (e: any) {
     logger.error({ route, details: e?.message }, "Role check failed");
     return res
-
       .status(401)
-      .json({ error: "Invalid Token", details: e?.message });
+      .json({ error: "Role check failed", details: e?.message });
   }
 };
