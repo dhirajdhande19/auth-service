@@ -28,7 +28,19 @@ export const googleCallback = async (
       res.status(400).json({ error: "Refresh Token is required" });
       return;
     }
-    await setRefreshTokenInRedis(refreshToken, email);
+    const status = await setRefreshTokenInRedis(refreshToken, email);
+
+    if (typeof status === "number") {
+      if (status === 400) {
+        res
+          .status(status)
+          .json({ message: "Invalid refreshToken or/and email" });
+      } else {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+      return;
+    }
+
     res.status(201).json(result);
     return;
   }

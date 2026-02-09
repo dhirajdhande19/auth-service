@@ -86,8 +86,12 @@ export const authenticateUser = async (
 
     if (!accessToken || !refreshToken) return 500;
 
-    await setRefreshTokenInRedis(refreshToken, userData.email);
+    const res = await setRefreshTokenInRedis(refreshToken, userData.email);
 
+    if (typeof res === "number") {
+      if (res === 400) return 400;
+      return 500;
+    }
     return {
       accessToken: accessToken,
       refreshToken: refreshToken,

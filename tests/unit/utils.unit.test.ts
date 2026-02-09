@@ -8,6 +8,7 @@ import {
   isHashedPassword,
   isUserRole,
   isValidAuthUser,
+  isValidEmail,
   isValidProvider,
   isValidUserData,
 } from "../../src/utils/helper";
@@ -152,6 +153,25 @@ describe("Valid user data to create token", () => {
   });
   test("should fail - empty user", () => {
     const result = isValidAuthUser(invalidEmptyOAuthUser);
+    expect(result).toBeFalsy();
+  });
+});
+
+// isValidEmail
+describe("Is valid email format", () => {
+  let email = "user@gmail.com";
+  test("should return true - valid email format", () => {
+    const result = isValidEmail(email);
+    expect(result).toBeTruthy();
+  });
+  test("should return false - invalid email format", () => {
+    email = "user.com";
+    const result = isValidEmail(email);
+    expect(result).toBeFalsy();
+  });
+  test("should return false - empty email", () => {
+    email = "";
+    const result = isValidEmail(email);
     expect(result).toBeFalsy();
   });
 });

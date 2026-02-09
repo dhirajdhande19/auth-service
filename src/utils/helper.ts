@@ -11,7 +11,13 @@ export const isHashedPassword = (hashedPassword: string): boolean => {
 };
 
 export const isValidUserData = (userData: UserData): boolean => {
-  if (!userData.id || !userData.email || !userData.role) return false;
+  if (
+    !userData.id ||
+    !userData.email ||
+    !isValidEmail(userData.email) ||
+    !userData.role
+  )
+    return false;
 
   if (!(userData.role in UserRole)) return false;
 
@@ -43,6 +49,7 @@ export const isValidAuthUser = (user: ValidAuthUserData): boolean => {
   if (
     !user ||
     !user.email ||
+    !isValidEmail(user.email) ||
     !user.id ||
     !user.provider ||
     !isValidProvider(user.provider) ||
@@ -51,4 +58,9 @@ export const isValidAuthUser = (user: ValidAuthUserData): boolean => {
     return false;
 
   return true;
+};
+
+export const isValidEmail = (email: string): boolean => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
 };

@@ -6,7 +6,11 @@ import {
   REDIS_EXPIRE_REFRESH_TOKEN,
 } from "../../config/env";
 import { redis } from "../../config/redis";
-import { isValidAuthUser, isValidProvider } from "../../utils/helper";
+import {
+  isValidAuthUser,
+  isValidEmail,
+  isValidProvider,
+} from "../../utils/helper";
 import { logger } from "../../utils/logger";
 import { ValidAuthUserData, UserData } from "../user/user.types";
 import { TokenInput, AccessToken } from "./token.types";
@@ -14,6 +18,7 @@ import jwt from "jsonwebtoken";
 
 export const getJwtAccessToken = (userData: TokenInput): string => {
   try {
+    if (!isValidAuthUser(userData)) return "";
     const accessToken = jwt.sign(
       {
         id: userData.id,
@@ -36,6 +41,7 @@ export const getJwtAccessToken = (userData: TokenInput): string => {
 
 export const getJwtRefreshToken = (userData: TokenInput): string => {
   try {
+    if (!isValidAuthUser(userData)) return "";
     const refreshToken = jwt.sign(
       {
         id: userData.id,
@@ -59,8 +65,9 @@ export const getJwtRefreshToken = (userData: TokenInput): string => {
 export const setRefreshTokenInRedis = async (
   refreshToken: string,
   email: string,
-): Promise<void> => {
+): Promise<void | number> => {
   try {
+    if (!refreshToken || !email || !isValidEmail(email)) return 400;
     // calculate expiry
     const expireIn = REDIS_EXPIRE_REFRESH_TOKEN
       ? Number(REDIS_EXPIRE_REFRESH_TOKEN) * 24 * 60 * 60
@@ -76,6 +83,7 @@ export const setRefreshTokenInRedis = async (
       .exec();
   } catch (e: any) {
     logger.error({ details: e?.message }, "Error from setRefreshTokenInRedis");
+    return 500;
   }
 };
 
