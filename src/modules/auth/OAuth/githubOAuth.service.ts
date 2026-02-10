@@ -9,13 +9,19 @@ import {
   TokenInput,
   TokensAfterLogin,
 } from "../../token/token.types";
-import { AuthProvider, OAuthUser, UserRole } from "../../user/user.types";
+import {
+  AuthProvider,
+  OAuthUser,
+  UserData,
+  UserRole,
+} from "../../user/user.types";
 import {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   GITHUB_REDIRECT_URI,
 } from "../../../config/env";
 import { logger } from "../../../utils/logger";
+import { isValidEmail, isValidUserData } from "../../../utils/helper";
 
 export const getUserEmailFromGithub = async (
   accessToken: string,
@@ -28,9 +34,9 @@ export const getUserEmailFromGithub = async (
       },
     });
 
-    if (!res.data) return 500;
+    if (!res.data || !res.data.email) return 500;
 
-    return res.data?.email as string;
+    return String(res.data.email);
   } catch (e: any) {
     logger.error({ details: e?.message }, "Error From getUserEmailFromGithub");
     return 500;
@@ -59,9 +65,9 @@ export const getGithubAccessToken = async (
       },
     );
 
-    if (!res.data) return 400;
+    if (!res.data || !res.data?.access_token) return 400;
 
-    return res.data?.access_token;
+    return res.data.access_token;
   } catch (e: any) {
     logger.error({ details: e?.message }, "Error From getGithubAccessToken");
     return 500;
@@ -72,7 +78,7 @@ export const registerGithubOAuthUser = async (
   email: string,
 ): Promise<number | TokensAfterLogin> => {
   try {
-    if (!email) return 400;
+    if (!email || !isValidEmail(email)) return 400;
     const isPrevUser = await redis.hgetall(`user: ${email}`);
 
     if (isPrevUser && isPrevUser.provider === "local") return 409;
@@ -89,7 +95,9 @@ export const registerGithubOAuthUser = async (
       await redis.hset(`user: ${email}`, userData);
     }
 
-    const user = await redis.hgetall(`user: ${email}`);
+    const user: any = await redis.hgetall(`user: ${email}`);
+
+    if (!isValidUserData(user)) return 400;
 
     const tokenInput: TokenInput = {
       id: user.id,

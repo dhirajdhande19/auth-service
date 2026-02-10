@@ -1,5 +1,3 @@
-// unit testing for auth
-
 import { redis } from "../../src/config/redis";
 import {
   authenticateUser,

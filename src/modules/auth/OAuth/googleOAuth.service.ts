@@ -15,6 +15,7 @@ import {
 
 import { TokensAfterLogin, TokenInput } from "../../token/token.types";
 import { logger } from "../../../utils/logger";
+import { isValidEmail, isValidUserData } from "../../../utils/helper";
 
 export const googleAuth = async (code: string): Promise<number | any> => {
   try {
@@ -57,7 +58,7 @@ export const registerGoogleOAuthUser = async (
   email: string,
 ): Promise<number | TokensAfterLogin> => {
   try {
-    if (!email) return 400;
+    if (!email || !isValidEmail(email)) return 400;
     const isPrevUser = await redis.hgetall(`user: ${email}`);
 
     if (isPrevUser && isPrevUser.provider === "local") return 409;
@@ -74,7 +75,8 @@ export const registerGoogleOAuthUser = async (
       await redis.hset(`user: ${email}`, userData);
     }
 
-    const user = await redis.hgetall(`user: ${email}`);
+    const user: any = await redis.hgetall(`user: ${email}`);
+    if (!isValidUserData(user)) return 400;
 
     const tokenInput: TokenInput = {
       id: user.id,

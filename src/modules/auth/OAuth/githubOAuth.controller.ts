@@ -30,14 +30,14 @@ export const githubCallback = async (
 ): Promise<void> => {
   const { code, state } = req.query;
 
-  const storedState = req.cookies.github_oauth_state;
+  const storedState = req.cookies?.github_oauth_state;
 
   if (!code || !state || !storedState || state !== storedState) {
     res.status(400).json({ error: "Invalid state or code" });
     return;
   }
 
-  const codeVerifier = req.cookies.github_code_verifier;
+  const codeVerifier = req.cookies?.github_code_verifier;
 
   if (!codeVerifier) {
     res.status(400).json({ error: "Invalid codeVerifier" });
