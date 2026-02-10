@@ -90,5 +90,3 @@ describe("registerGoogleOAuthUser", () => {
     expect(result).toBe(400);
   });
 });
-
-afterAll(async () => await redis.quit());

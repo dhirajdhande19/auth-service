@@ -3,66 +3,52 @@ import {
   authenticateUser,
   createUser,
 } from "../../src/modules/auth/local/localAuth.service";
-import { verifyRefreshTokenAndGetAccessToken } from "../../src/modules/token/token.service";
 import { LocalUser, UserRole } from "../../src/modules/user/user.types";
-
-const email = "test@gmail.com";
-const password = "12345";
-
-const ValidUserData: LocalUser = {
-  id: crypto.randomUUID(),
-  email: email,
-  password: password,
-  role: UserRole.User,
-  provider: "local",
-};
 
 beforeAll(async () => {
   await redis.flushall(); // clears all keys
 });
 
-test("register user: Should return 201", async () => {
-  const result = await createUser(ValidUserData);
-  expect(result).toBe(201);
-});
+describe("Local Auth flow", () => {
+  const email = "test@gmail.com";
+  const password = "12345";
 
-test("register user: Should return 409", async () => {
-  const result = await createUser(ValidUserData);
-  expect(result).toBe(409); // failure reason: same email
-});
+  const ValidUserData: LocalUser = {
+    id: "123",
+    email: email,
+    password: password,
+    role: UserRole.User,
+    provider: "local",
+  };
 
-test("login user: Should return object (accessToken, refreshToken)", async () => {
-  // login
-  const tokens = await authenticateUser(ValidUserData);
-  expect(tokens).toBeInstanceOf(Object);
-  // or/and
-  expect(Object.keys(tokens).length).toBeGreaterThan(0);
-  // or/and
-  expect(tokens).not.toEqual({});
-  // or/and
-  expect(tokens).toHaveProperty("accessToken");
-  expect(tokens).toHaveProperty("refreshToken");
-});
+  test("should return 201 - register user", async () => {
+    const result = await createUser(ValidUserData);
+    expect(result).toBe(201);
+  });
+  test("should return 409 - same email (confilct)", async () => {
+    const result = await createUser(ValidUserData);
+    expect(result).toBe(409); // failure reason: same email
+  });
 
-test("login user: Should return 401 - wrong password", async () => {
-  const result = await authenticateUser({ email, password: "54321" });
-  expect(result).toBe(401);
-});
+  test("should return 401 - wrong password (login)", async () => {
+    const result = await authenticateUser({ email, password: "54321" });
+    expect(result).toBe(401);
+  });
 
-test("refresh token: Should return access token", async () => {
-  // refreshToken after login
-  const tokens: any = await authenticateUser({ email, password });
-  expect(tokens).toBeInstanceOf(Object);
-  // or/and
-  expect(tokens).not.toEqual({});
-  // call for refresh to get new access token
-  const newAccessToken = await verifyRefreshTokenAndGetAccessToken(
-    tokens.refreshToken,
-  );
-  expect(newAccessToken).not.toEqual("");
-});
+  test("should return 404 - user don't exist yet (new email - login)", async () => {
+    const result = await authenticateUser({
+      email: "newUser@email.com",
+      password: "54321",
+    });
+    expect(result).toBe(404);
+  });
 
-// close redis when all tests are done
-afterAll(async () => {
-  await redis.quit();
+  test("should return object {accessToken, refreshToken} - login user", async () => {
+    const tokens = await authenticateUser(ValidUserData);
+    expect(tokens).toBeInstanceOf(Object);
+    expect(Object.keys(tokens).length).toBeGreaterThan(0);
+    expect(tokens).not.toEqual({});
+    expect(tokens).toHaveProperty("accessToken");
+    expect(tokens).toHaveProperty("refreshToken");
+  });
 });

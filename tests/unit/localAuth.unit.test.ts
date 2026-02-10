@@ -87,8 +87,3 @@ describe("Login Unit Test", () => {
     expect(result).toBe(401);
   });
 });
-
-// close redis when all tests are done
-afterAll(async () => {
-  await redis.quit();
-});

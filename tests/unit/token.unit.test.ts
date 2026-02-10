@@ -230,8 +230,3 @@ describe("revokeAllSessions", () => {
     expect(result).toBe(404);
   });
 });
-
-// close redis when all tests are done
-afterAll(async () => {
-  await redis.quit();
-});
