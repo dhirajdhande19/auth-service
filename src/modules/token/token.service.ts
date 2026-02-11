@@ -138,7 +138,7 @@ export const revokeCurrentSession = async (
     await redis
       .multi()
       .del(key) // revoke curr session
-      .srem(`refreshTokens:${email}`, refreshToken) // revoke curr session from all sessions list
+      .srem(`refreshTokens: ${email}`, refreshToken) // revoke curr session from all sessions list
       .exec();
 
     return 200;
@@ -158,11 +158,11 @@ export const revokeAllSessions = async (
 
     if (!email) return 404;
 
-    const tokens = await redis.smembers(`refreshTokens:${email}`);
+    const tokens = await redis.smembers(`refreshTokens: ${email}`);
 
     const pipeline = redis.multi();
-    tokens.forEach((token) => pipeline.del(`refreshToken:${token}`)); // delete all tokens from list
-    pipeline.del(`refreshTokens:${email}`); // delete list of tokens
+    tokens.forEach((token) => pipeline.del(`refreshToken: ${token}`)); // delete all tokens from list
+    pipeline.del(`refreshTokens: ${email}`); // delete list of tokens
     await pipeline.exec();
 
     return 200;

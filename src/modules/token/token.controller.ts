@@ -53,7 +53,7 @@ export const invalidateSingleSession = async (
   } else if (result === 400) {
     res.status(result).json({ error: "Refresh Token is required!" });
   } else if (result === 404) {
-    res.status(result).json({ error: "Invalid/Expired Refresh Token" });
+    res.status(result).json({ error: "Invalid / Expired Refresh Token" });
   } else {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -72,7 +72,7 @@ export const invalidateAllSesssions = async (
   } else if (result === 400) {
     res.status(result).json({ error: "Refresh Token is required!" });
   } else if (result === 404) {
-    res.status(result).json({ error: "Invalid/Expired Refresh Token" });
+    res.status(result).json({ error: "Invalid / Expired Refresh Token" });
   } else {
     res.status(500).json({ error: "Internal Server Error" });
   }

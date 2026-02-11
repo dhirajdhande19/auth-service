@@ -20,6 +20,7 @@ export const JWT_EXPIRES_IN_REFRESH_TOKEN = process.env
 // redis expire refresh token(in days)
 export const REDIS_EXPIRE_REFRESH_TOKEN =
   process.env.REDIS_EXPIRE_REFRESH_TOKEN;
+export const REDIS_URL = process.env.REDIS_URL as string;
 
 // Google OAuth
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;

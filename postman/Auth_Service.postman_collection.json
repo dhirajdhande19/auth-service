@@ -1,0 +1,273 @@
+{
+  "info": {
+    "_postman_id": "fbdaf12b-1ec9-4fac-b9e6-046286f0037b",
+    "name": "Auth Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51026917",
+    "_collection_link": "https://go.postman.co/collection/51026917-fbdaf12b-1ec9-4fac-b9e6-046286f0037b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"12345\"\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"12345\"\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Protected",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1OGJhODg3LTIxOGItNGI0Yi1iZjFlLTNhYjAyZjNmMjYzZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ2l0aHViIiwiaWF0IjoxNzcwNzQyNzM4LCJleHAiOjE3NzA3NDI3NTh9.1coWLaUr369P7_-s1teAdx67xI14hzC3R5iImu75Eo8",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\"accessToken\": \"\"\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/user/protected",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "user",
+            "protected"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin_Route",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1OGJhODg3LTIxOGItNGI0Yi1iZjFlLTNhYjAyZjNmMjYzZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ2l0aHViIiwiaWF0IjoxNzcwNzQyNzk3LCJleHAiOjE3NzA3NDI4MTd9.v4YzWSI-xiBUxtHc7ryW8R9iHeVQZmd4Mg7xnRKuELw",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:4000/api/user/admin",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "user",
+            "admin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Refresh Token",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1OGJhODg3LTIxOGItNGI0Yi1iZjFlLTNhYjAyZjNmMjYzZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ2l0aHViIiwiaWF0IjoxNzcwNzQzNjI1LCJleHAiOjE3NzEzNDg0MjV9.vPpL7VaaSF_U5VCPuYimtarqHZrnKBoW33B0XU6a-9s\"\r\n\r\n}\r\n\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/token/refresh",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "token",
+            "refresh"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "other_routes",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJhNjczMjdhLTM0MzEtNDU0OC04NjAzLWRjYjQ5MGU0ZDg4ZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ29vZ2xlIiwiaWF0IjoxNzcwMzc1NjUwLCJleHAiOjE3NzAzNzU2NzB9.s91YbqYWy7F7o_hW0djOEh2lKpwcPo4Fv_DApJ2Nx1o",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:4000/api/user/other_routes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "user",
+            "other_routes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalidate",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1OGJhODg3LTIxOGItNGI0Yi1iZjFlLTNhYjAyZjNmMjYzZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ2l0aHViIiwiaWF0IjoxNzcwNzQzNjkwLCJleHAiOjE3NzEzNDg0OTB9.rS0PF502Fv6juG_Bbg01TlNXnzxm2Xz_oSq79Xdr1WU\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/token/invalidate",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "token",
+            "invalidate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalidate/all",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1OGJhODg3LTIxOGItNGI0Yi1iZjFlLTNhYjAyZjNmMjYzZSIsImVtYWlsIjoiZGhpcmFqZGhhbmRlMkBnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsInByb3ZpZGVyIjoiZ2l0aHViIiwiaWF0IjoxNzcwNzQzNjUzLCJleHAiOjE3NzEzNDg0NTN9.fJ54ew-0Q5B7c12862rL5_3euVSDE5NWjSdlHZed9MQ\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/token/invalidate/all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "api",
+            "token",
+            "invalidate",
+            "all"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

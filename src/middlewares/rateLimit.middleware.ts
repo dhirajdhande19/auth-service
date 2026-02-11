@@ -10,7 +10,7 @@ export const rateLimit = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const route = req.originalUrl;
+  const route = req.path;
   try {
     logger.info({ route }, "Rate limit check started");
     logger.info(
@@ -29,8 +29,8 @@ export const rateLimit = async (
     const prevWindow = currWindow - 1;
 
     const baseKey = req.user?.id
-      ? `key:api-${req.originalUrl}:userId:${req.user.id}`
-      : `key:api-${req.originalUrl}:userId:${req.ip}`;
+      ? `key:api-${req.path}:userId:${req.user.id}`
+      : `key:api-${req.path}:userId:${req.ip}`;
 
     const currWindowKey = `${baseKey}:window-${currWindow}`;
     const prevWindowKey = `${baseKey}:window-${prevWindow}`;

@@ -18,7 +18,7 @@ export const adminRoleMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  const route = req.originalUrl;
+  const route = req.path;
   try {
     logger.info({ route }, "Role check started");
     const userRole = req.user?.role;

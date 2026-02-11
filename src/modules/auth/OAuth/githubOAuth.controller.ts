@@ -90,9 +90,9 @@ export const githubCallback = async (
 
   // failure cases
   if (result === 409) {
-    res
-      .status(result)
-      .json({ message: "User already exists, try loging in locally" });
+    res.status(result).json({
+      message: "User localy exists with given email, log in locally!",
+    });
   } else if (result === 400) {
     res.status(result).json({ error: "Email is required" });
   } else {

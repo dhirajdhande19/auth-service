@@ -56,8 +56,12 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   } else if (result === 404) {
     // user not found
     res.status(result).json({
-      error:
-        "No user found with given email, Register first! or Invalid User Data",
+      error: "No user found with given email!",
+      details: {
+        solution1: "Verify is the data ur sending is correct",
+        solution2: "Register first if new user",
+        solution3: "If Registered via OAuth log in via OAuth",
+      },
     });
   } else {
     // internal server issues

@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import { logger } from "../utils/logger";
-const redis = new Redis();
+import { REDIS_URL } from "./env";
+const redis = new Redis(REDIS_URL);
 let isRedisOnline = false;
 
 redis.on("error", (e) => {

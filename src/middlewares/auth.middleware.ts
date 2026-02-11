@@ -18,7 +18,7 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  const route = req.originalUrl;
+  const route = req.path;
   try {
     logger.info({ route }, "Auth check started");
     const accessToken = req.headers?.authorization?.split(" ")[1];

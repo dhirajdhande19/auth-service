@@ -4,7 +4,7 @@ import { logger } from "../utils/logger";
 
 export const validate =
   (schema: z.ZodType) => (req: Request, res: Response, next: NextFunction) => {
-    const route = req.originalUrl;
+    const route = req.path;
 
     try {
       logger.info({ route }, "Zod validation started");
@@ -12,7 +12,10 @@ export const validate =
       const result = schema.safeParse(req.body);
 
       if (!result.success) {
-        logger.error({ route, details: result.error }, "Zod validation failed");
+        logger.error(
+          { route, details: z.treeifyError(result.error) },
+          "Zod validation failed",
+        );
 
         return res.status(400).json({
           error: "Validation error",
