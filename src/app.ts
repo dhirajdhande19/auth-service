@@ -19,9 +19,11 @@ app.use("/api/token", rateLimit, tokenRoutes);
 app.use("/api/user", rateLimit, authMiddleware, userRoutes);
 
 app.get("/auth_service", (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({ message: "Welcome! This is home page for auth service" });
+  res.status(200).json({
+    message: "Welcome! This is the home page for auth service",
+    details:
+      "For more information go to -> 'https://github.com/dhirajdhande19/auth-service'",
+  });
 });
 
 export default app;
