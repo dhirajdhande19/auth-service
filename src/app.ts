@@ -18,8 +18,10 @@ app.use("/api/auth", rateLimit, authRoutes);
 app.use("/api/token", rateLimit, tokenRoutes);
 app.use("/api/user", rateLimit, authMiddleware, userRoutes);
 
-app.get("/auth_system", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Home Page For Auth System" });
+app.get("/auth_service", (req: Request, res: Response) => {
+  res
+    .status(200)
+    .json({ message: "Welcome! This is home page for auth service" });
 });
 
 export default app;
