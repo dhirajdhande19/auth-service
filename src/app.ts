@@ -22,7 +22,7 @@ app.get("/auth_service", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Welcome! This is the home page for auth service",
     details:
-      "For more information go to -> 'https://github.com/dhirajdhande19/auth-service'",
+      "For more information go to - 'https://github.com/dhirajdhande19/auth-service'",
   });
 });
 
