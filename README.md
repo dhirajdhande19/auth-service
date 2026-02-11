@@ -8,6 +8,22 @@ Designed to simulate real-world authentication architecture and performance trad
 
 ---
 
+## 🌍 Live Deployment
+
+This service is deployed and publicly accessible.
+
+**Live URL:**
+
+```
+https://auth-service-kwdl.onrender.com/auth_service
+```
+
+Hosted on **Render** with Redis cloud backend.
+
+> Deployed environment mirrors local configuration (JWT + Redis-backed session validation).
+
+---
+
 ## 🚀 Features
 
 * 🔑 Access & Refresh Token Authentication (separate secrets)
