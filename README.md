@@ -12,11 +12,7 @@ Designed to simulate real-world authentication architecture and performance trad
 
 This service is deployed and publicly accessible.
 
-**Live URL:**
-
-```
-https://auth-service-kwdl.onrender.com/auth_service
-```
+**Live URL:**    [auth_service](https://auth-service-kwdl.onrender.com/auth_service)
 
 Hosted on **Render** with Redis cloud backend.
 
